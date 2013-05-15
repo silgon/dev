@@ -1,0 +1,8 @@
+[Bb]in/
+[Bb]uild/
+*~
+\#*#
+*.swp
+*.swo
+.\#*
+octave-core
