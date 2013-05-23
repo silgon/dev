@@ -7,12 +7,12 @@
 # located at http://greg.czerniak.info/node/5.
 import random
 import numpy as np
-import pylab
+import matplotlib.pyplot as plt
 
 # Implements a linear Kalman filter.
 class KalmanFilterLinear:
   def __init__(self,_A, _B, _H, _x, _P, _Q, _R):
-    self.A = _A                      # State transition matrix.
+    self.A = np.eye(_A.shape[0])+_A                      # State transition matrix.
     self.B = _B                      # Control matrix.
     self.H = _H                      # Observation matrix.
     self.x = _x                      # Initial state estimate.
@@ -24,7 +24,7 @@ class KalmanFilterLinear:
   def Step(self,u,z): # u:control vector, z: measurement
     #---------------------------Prediction step-----------------------------
     xhat = self.A * self.x + self.B * u # predicted state
-    Phat = (self.A * self.P) * self.A.T + H*self.Q*H.T # covariance estimate
+    Phat = (self.A * self.P) * self.A.T + self.H*self.Q*self.H.T # covariance estimate
     #--------------------------Observation step-----------------------------
     ytil = z - self.H*xhat # innovation: measurement residual
     S = self.H*Phat*self.H.T + self.R # innovation: residual covariance 
@@ -35,16 +35,8 @@ class KalmanFilterLinear:
     size = self.P.shape[0]
     self.P = (np.eye(size)-K*self.H)*Phat
 
-class Voltmeter:
-  def __init__(self,_truevoltage,_noiselevel):
-    self.truevoltage = _truevoltage
-    self.noiselevel = _noiselevel
-  def GetVoltage(self):
-    return self.truevoltage
-  def GetVoltageWithNoise(self):
-    return random.gauss(self.GetVoltage(),self.noiselevel)
 class System1():
-  """
+  """ This is a really easy system
   """
   
   def __init__(self, _A,_B,_Q):
@@ -54,58 +46,52 @@ class System1():
     - `_A`:
     - `_B`:
     """
-    self.A = _A
+    self.A = np.eye(_A.shape[0])+_A                      # State transition matrix.
     self.B = _B
     self.Q=_Q
   def getVal(self,x,u):
-    return A*x+B*u
+    return self.A*x+self.B*u
   def getNVal(self,x,u):
-    return self.getVal(x,u)+np.multiply(Q,np.random.randn(Q.shape[0],Q.shape[1]))*np.mat(np.ones((Q.shape[1],1)))
+    return self.getVal(x,u)+np.multiply(self.Q,np.random.randn(self.Q.shape[0],self.Q.shape[1]))*np.mat(np.ones((self.Q.shape[1],1)))
 
 numsteps = 50
 
-# A = np.mat([2])
-# H = np.mat([1]) # observation matrix
-# B = np.mat([1]) # 
-# Q = np.mat([0.00001]) # error in process
-# R = np.mat([0.1]) # error in measurements
-# xhat = np.mat([3]) # first estimated value
-# P    = np.mat([1]) # first estimated covariance estimate
-
-A=np.mat('0 1; 0 0')
+A=np.mat('0 5; 0 0')
 B=np.mat('0 0; 0 1')
 R=np.mat('0.1 0.1; 0.1 0.1')
 H = np.mat('1 0; 0 1') # observation matrix
-Q = np.mat('0.1 0.1; 0.1 0.1') # error in process
-R = np.mat('0.1 0.1; 0.1 0.1') # error in measurements
-xhat = np.mat('4;4') # first estimated value
+Q = np.mat('1 1; 1 1') # error in process
+R = np.mat('1.5 1.5; 1.5 1.5') # error in measurements
+xhat = np.mat('2;0') # first estimated value
 x = np.mat('1;1') # first value
-
-P    = np.mat('1 1; 1 1') # first estimated covariance estimate
-
-
+P= np.mat('.1 .1; .1 .1') # first estimated covariance estimate
 
 filter = KalmanFilterLinear(A,B,H,xhat,P,Q,R)
-# voltmeter = Voltmeter(1.25,0.25)
 s1=System1(A,B,Q)
-measuredvoltage = x
-truevoltage = []
+measures = xhat
+real = x
 kalman = filter.GetCurrentState()
 
 for i in range(numsteps):
-  u=np.mat([[0],[float(i)**2/50]])
+  u=np.mat([[0],[1]])
   measured = s1.getNVal(x,u)
-  measuredvoltage=np.hstack((measuredvoltage,measured))
-  x=measured
-  # truevoltage.append(voltmeter.GetVoltage())
+  measures=np.hstack((measures,measured))
+  # x=measured
+  real=np.hstack((real,s1.getVal(x,u)))
+  x=s1.getVal(x,u)
+  # real.append(voltmeter.GetVoltage())
   # print filter.GetCurrentState()
   kalman=np.hstack((kalman,filter.GetCurrentState()))
   filter.Step(u,measured)
-
-# pylab.plot(range(numsteps),measuredvoltage,'b',range(numsteps),truevoltage,'r',range(numsteps),kalman,'g')
-pylab.plot(measuredvoltage[0,:],measuredvoltage[1,:],'b+',kalman[0,:],kalman[1,:],'r+')
-pylab.xlabel('x1')
-pylab.ylabel('x2')
-pylab.title('tururu')
-# pylab.legend(('measured','true voltage','kalman'))
-pylab.show()
+measures=measures.T
+real=real.T
+kalman=kalman.T
+plt.plot(measures[:,0],measures[:,1],'g+',
+         kalman[:,0],kalman[:,1],'r',
+         real[:,0],real[:,1],'b',
+         )
+plt.xlabel('x1')
+plt.ylabel('x2')
+plt.title('')
+# plt.legend(('measured','true voltage','kalman'))
+plt.show()
