@@ -56,7 +56,7 @@ class System1():
 
 numsteps = 50
 
-A=np.mat('0 5; 0 0')
+A=np.mat('0 1; 0 0')
 B=np.mat('0 0; 0 1')
 R=np.mat('0.1 0.1; 0.1 0.1')
 H = np.mat('1 0; 0 1') # observation matrix
