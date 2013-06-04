@@ -2,6 +2,7 @@
 #include "rapidxml_print.hpp"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 using namespace rapidxml;
 using namespace std;
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
 	buffer << file.rdbuf();
 	std::string content(buffer.str());
 	doc.parse<0>(&content[0]);
-
+	std::cout << content << std::endl;
     
     return 0;
 }
