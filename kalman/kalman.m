@@ -55,6 +55,7 @@ xk=x; %% estimated states
 F=eye(size(A))+A*dt;
 for i=2:steps+1
   %% Prediction Step
+  %% xhat=F*x+B*u; % Predicted state estimate with discrete time
   xhat=F*x+B*u*dt; % Predicted state estimate
   Phat=F*P*F'+Q; % Predicted estimate covariance
   %% Observation Step
@@ -71,16 +72,3 @@ end;
 plot(timeline,xs(1,:),'k',...
 	timeline,xm(1,:),'r-',...
 	timeline,xk(1,:),'b')
-
-
-%% %% Kalman Filter
-%% %% Prediction Step
-%% xhat=F*x+B*u; % Predicted state estimate
-%% Phat=F*P*F'+Q; % Predicted estimate covariance
-%% %% Observation Step
-%% y=z-H*xhat; % Innovation: Measurement residual
-%% S=H*Phat*H'+R; % Innovation: Residual Covariance
-%% %% Update Step
-%% K=Phat*H'*inv(S) % Kalman gain
-%% x=xhat+K*y; % Updated state estimate
-%% P=(eye(size(A))-K*H)*Phat
