@@ -1,7 +1,7 @@
 clear all; clc; clf;
 
 % Simulation Parameters
-seconds=2
+seconds=2;
 dt=.01;
 steps=seconds/dt;
 timeline=0:dt:seconds;
@@ -17,7 +17,7 @@ B=[0 0;
 H=[1 0;
    0 0];
 % Q (process error) Matrix
-Q=eye(size(A))*0;
+Q=eye(size(A))*.5;
 % ATTENTION:for the next part take care with the dt variable, if the noise of your process is respect to time
 w=Q*randn(size(Q,2),1)*dt; % w_k~N(0,Q) (montecarlo in process) 
 % R (measurements error) Matrix
@@ -57,7 +57,7 @@ for i=2:steps+1
   %% Prediction Step
   %% xhat=F*x+B*u; % Predicted state estimate with discrete time
   xhat=F*x+B*u*dt; % Predicted state estimate
-  Phat=F*P*F'+Q; % Predicted estimate covariance
+  Phat=F*P*F'+Q*dt; % Predicted estimate covariance
   %% Observation Step
   z=xm(:,i);
   y=z-H*xhat; % Innovation: Measurement residual
@@ -71,4 +71,5 @@ end;
 
 plot(timeline,xs(1,:),'k',...
 	timeline,xm(1,:),'r-',...
-	timeline,xk(1,:),'b')
+	timeline,xk(1,:),'b');
+legend('real','measured','estimated');
