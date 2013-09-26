@@ -30,8 +30,7 @@ u2d=sech(x)-2*sech(x).^3
 
 ut=fft(u); % fast fourier transform
 
-% check out the algorithm, it's suppose to be a powerful one to
-% spectral differentiate stuff
+% check out the algorithm, spectral differentiation
 uds=ifft((i*k).*ut); % inverse fourier transform 
 u2ds=ifft((i*k).^2.*ut);
 ks=fftshift(k);
