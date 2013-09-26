@@ -17,7 +17,7 @@ B=[0 0;
 H=[1 0;
    0 0];
 % Q (process error) Matrix
-Q=eye(size(A))*.5;
+Q=eye(size(A))*2;
 % ATTENTION:for the next part take care with the dt variable, if the noise of your process is respect to time
 w=Q*randn(size(Q,2),1)*dt; % w_k~N(0,Q) (montecarlo in process) 
 % R (measurements error) Matrix
