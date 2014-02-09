@@ -27,4 +27,4 @@ class Unicycle():
         dy=z[4]
         dth=z[5]
         dt=self._dt
-        return array([[dx*cos(th)*dt,dx*sin(th)*dt,dth*dt,0,0,0]]).T
+        return array([dx*cos(th)*dt,dx*sin(th)*dt,dth*dt,0,0,0]).T
