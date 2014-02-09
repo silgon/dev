@@ -3,17 +3,29 @@ import matplotlib.pylab as plt
 from unicycle import Unicycle
 
 # states
-z=[0,0,0,1,0,0]
 t=20
 dt=0.01
 
-z=array(z)
-uni= Unicycle(z,dt)
-zz=array([z]).T
+# person
+pz=[1,2,0,1,0,0] 
+pz=array(pz)
+p= Unicycle(pz,dt)
+pzz=array([pz]).T
+# robot
+rz=[0,0,0,.5,0,0] 
+rz=array(rz)
+r= Unicycle(rz,dt)
+rzz=array([rz]).T
+
 for i in arange(0,t,dt):
-    z[5]+=0.001
-    dz=uni.derivative(z)
-    z=z+dz
-    zz=append(zz,array([z]).T,1)
-plt.plot(zz[0,:],zz[1,:])
+    pz[5]+=0.001 # aumenting omega in person
+    pdz=p.derivative(pz)
+    pz=pz+pdz
+    pzz=append(pzz,array([pz]).T,1)
+    rdz=p.derivative(rz)
+    rz=rz+rdz
+    rzz=append(rzz,array([rz]).T,1)
+
+plt.plot(pzz[0,:],pzz[1,:])
+plt.plot(rzz[0,:],rzz[1,:])
 plt.show()
