@@ -6,3 +6,4 @@
 *.swo
 .\#*
 octave-core
+*.pyc
