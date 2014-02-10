@@ -1,11 +1,12 @@
-% source: http://home2.fvcc.edu/~dhicketh/DiffEqns/spring03projects/MarkJohn/newpursiut.htm
-% example
-% [t,u]=ode45('line1',[0,8],[0;0],[],.75);
-% x = t-4;
-% y = t;
-% h = plot(x, y, 'k', u(:,1),u(:,2), 'r');
-% legend(h, 'Pursued Curve', 'Pursuit Curve');
-% axis equal;
+%% source: http://home2.fvcc.edu/~dhicketh/DiffEqns/spring03projects/MarkJohn/newpursiut.htm
+%% example
+%% [t,u]=ode45('line1',[0,8],[0;0],[],.75);
+%% [t,u]=ode45(@line1,[0,8],[0;0],[],.75);
+%% x = t-4;
+%% y = t;
+%% h = plot(x, y, 'k', u(:,1),u(:,2), 'r');
+%% legend(h, 'Pursued Curve', 'Pursuit Curve');
+%% axis equal;
 function Uprime=line1(t,u,flag,k)
 Uprime=zeros(2,1);
 p=t-4;
