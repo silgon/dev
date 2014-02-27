@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-__author__ = ['silgon']
-
+# author: silgon
+# email: silgon3200@gmail.com
 from numpy import *
 # import matplotlib.pylab as plt
 

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# author: silgon
+# email: silgon3200@gmail.com
 from numpy import *
 import matplotlib.pylab as plt
 from unicycle import Unicycle
