@@ -1,6 +1,6 @@
 [submodule "opencv"]
 	path = opencv
-	url = git@bitbucket.org:omarislas/opencv.git
+	url = git@github.com:silgon/opencv-practice.git
 [submodule "android"]
 	path = android
 	url = git@bitbucket.org:omarislas/ant_dev.git
