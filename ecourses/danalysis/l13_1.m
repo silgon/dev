@@ -1,4 +1,4 @@
-%% 
+%% filtering signal
 
 clear all; close all; clc;
 A=imread('london.jpg'); % read image
