@@ -20,7 +20,7 @@ pcolor(F), shading interp, colormap hot
 % Filter * Image
 Abwtf=Abwt.*F;
 Abwf=ifft2(fftshift(Abwtf));
-A2=uint8(Abwf);
+A2=uint8(real(Abwf)); % in octave real is needed because they are some complex numbers
 subplot(1,3,1), imshow(A1)
 subplot(1,3,2), imshow(A2)
 subplot(1,3,3), imshow(A3)

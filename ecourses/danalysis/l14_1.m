@@ -1,7 +1,7 @@
 % diffusion example
 clear all; close all; clc;
 
-A=imread('london','jpg');
+A=imread('london.jpg');
 Abw=rgb2gray(A);
 A2=double(Abw);
 [nx,ny]=size(A2);
@@ -21,7 +21,12 @@ L=kron(Iy,Dx)+kron(Dy,Ix);
 tspan=[0 0.002 0.004 0.006];
 An2=reshape(An,nx*ny,1);
 D=1;
-[t,usol]=ode45('zoo_rhs',tspan,An2,[],L,D);
+if isOctave()  
+    [t,usol]=ode45(@zoo_rhs,tspan,An2,[],L,D); % need some modifications in octave
+else
+    [t,usol]=ode45('zoo_rhs',tspan,An2,[],L,D);
+end
+
 for j=1:length(t)
     Atemp=uint8(reshape(usol(j,:),nx,ny));
     subplot(2,2,j), imshow(Atemp)
