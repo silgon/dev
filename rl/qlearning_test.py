@@ -106,7 +106,7 @@ for iters in range(1000):
         a_p=np.random.permutation(4)[0] # policy: random permutation
         Q_k=Q.getQVal(s,a)
         Q_k1=Q.getQVal(s_p,a_p)
-        R=1 if isGoal(grid,s) else 0
+        R=pam[s[0],s[1]]
         tmp=Q_k+alpha*(R+gamma*Q_k1-Q_k)
         Q.setQVal(s,a,tmp)
         if isGoal(grid,s):
