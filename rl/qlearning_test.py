@@ -90,8 +90,12 @@ class L():
             3: [s[0], s[1]+1],  # right
             4: [s[0], s[1]],  # nothing
         }[a]
-        nxt[0] = self._x-1 if nxt[0] == -1 else 0 if nxt[0] == self._x else nxt[0]
-        nxt[1] = self._y-1 if nxt[1] == -1 else 0 if nxt[1] == self._y else nxt[1]
+        # limit conditions, cicle the square states
+        # nxt[0] = self._x-1 if nxt[0] == -1 else 0 if nxt[0] == self._x else nxt[0]
+        # nxt[1] = self._y-1 if nxt[1] == -1 else 0 if nxt[1] == self._y else nxt[1]
+        # limit conditions, limit to square
+        nxt[0] = 0 if nxt[0] == -1 else self._x-1 if nxt[0] == self._x else nxt[0]
+        nxt[1] = 0 if nxt[1] == -1 else self._y-1 if nxt[1] == self._y else nxt[1]
         return nxt
 # Creating the values
 x, y = pam.shape
