@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-sig_rx = 2
-sig_lx = 1
-sig_y = 2
+sig_x_front = 2
+sig_x_back = 1
+sig_y_sides = 2
+mu_x = 0
+mu_y = 0
 
 step = .1
 side = np.arange(-10, 10, step)
@@ -13,19 +15,17 @@ def proxemics(x=0, y=0, th=0):
     """Proxemics mapping of one person with 2 gaussians (front and back)
     variables are position and orientation of this person
     """
-    # a = np.cos(th)**2/2/sig_rx**2 + np.sin(th)**2/2/sig_y**2
-    # b = -np.sin(2*th)/4/sig_rx**2 + np.sin(2*th)/4/sig_y**2
-    # c = np.sin(th)**2/2/sig_rx**2 + np.cos(th)**2/2/sig_y**2
-    # Z = np.exp(-(a*(X-x)**2 + 2*b*(X-x)*(Y-y) + c*(Y-y)**2))
-    # Rotation
+    # reshape base values
     X_tmp = np.reshape(X_base,(size*size))
     Y_tmp = np.reshape(Y_base,(size*size))
-    tmp = np.dot(rot(th), np.array([X_tmp, Y_tmp]))
+    # translate and rotate matrix
+    tmp = np.dot(rot(th), np.array([X_tmp - x, Y_tmp - y]))
+    # reshape
     X = np.reshape(tmp[0,:], (size, size))
     Y = np.reshape(tmp[1,:], (size, size))
-    
-    Z = np.exp(-((X-x)**2/(2*np.where(X > x, sig_rx, sig_lx)**2)
-             +(Y-y)**2/(2*np.where(X > x, sig_y, sig_y)**2)))
+    # calculate gaussian
+    Z = np.exp(-((X-mu_x)**2/(2*np.where(X > mu_x, sig_x_front, sig_x_back)**2)
+             +(Y-mu_y)**2/(2*np.where(X > mu_x, sig_y_sides, sig_y_sides)**2)))
     return Z
 
 def rot(theta):
@@ -40,6 +40,7 @@ Z3 = proxemics(0,2, np.pi/2.)
 
 # Sum
 Z = Z1+Z2+Z3
+# Z = proxemics(2,2,0)+proxemics(-2,-2,np.pi)
 plt.subplot(2,2,1)
 plt.title("Sum")
 plt.pcolormesh(X_base, Y_base, Z)
@@ -51,14 +52,14 @@ plt.title("Gradient Quiver")
 gy,gx = np.gradient(Z, step, step)
 plt.quiver(X_base, Y_base, gy, gx)
 
-# x-gradient
+# mu_x-gradient
 plt.subplot(2,2,3)
-plt.title("Gradient x axis")
+plt.title("Gradient mu_x axis")
 plt.pcolormesh(X_base, Y_base, gx)
 plt.colorbar()
-# y-gradient
+# mu_y-gradient
 plt.subplot(2,2,4)
-plt.title("Gradient y axis")
+plt.title("Gradient mu_y axis")
 plt.pcolormesh(X_base, Y_base, gy)
 plt.colorbar()
 
