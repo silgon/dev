@@ -19,7 +19,7 @@ def proxemics(x=0, y=0, th=0):
     X_tmp = np.reshape(X_base,(size*size))
     Y_tmp = np.reshape(Y_base,(size*size))
     # translate and rotate matrix
-    tmp = np.dot(rot(th), np.array([X_tmp - x, Y_tmp - y]))
+    tmp = np.dot(rot(-th), np.array([X_tmp - x, Y_tmp - y]))
     # reshape
     X = np.reshape(tmp[0,:], (size, size))
     Y = np.reshape(tmp[1,:], (size, size))
