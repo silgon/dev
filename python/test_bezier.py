@@ -32,5 +32,6 @@ x, y = Bezier(list(zip(xp, yp))).T
 
 plt.plot(x,y)
 plt.plot(xp,yp,"ro")
+plt.plot(xp,yp,"b--")
 
 plt.show()
