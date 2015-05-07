@@ -12,9 +12,16 @@ class Main(QtGui.QMainWindow):
 
         # connect signals
         self.ui.resetButton.clicked.connect(self.on_button)
+        self.ui.x_vel.valueChanged.connect(self.on_x_vel)
+        self.ui.y_vel.valueChanged.connect(self.on_y_vel)
 
     def on_button(self):
-        print 'Button clicked!'
+        self.ui.x_vel.setValue(0)
+        self.ui.y_vel.setValue(0)
+    def on_x_vel(self):
+        self.ui.x_label.setText(str(self.ui.x_vel.value()))
+    def on_y_vel(self):
+        self.ui.y_label.setText(str(self.ui.y_vel.value()))
 
 
 if __name__ == '__main__':
