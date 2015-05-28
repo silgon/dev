@@ -12,12 +12,15 @@ from rlpy.Domains import GridWorld
 from rlpy.Representations import Tabular, RBF
 from rlpy.Policies import eGreedy
 from rlpy.Experiments import Experiment
+from rlpy.Agents import SARSA
+from rlpy.Agents import Q_Learning
 import os
 
 from SARSA0 import SARSA0
 from IncrTabularTut import IncrTabularTut
 from ChainMDPTut import ChainMDPTut
 from eGreedyTut import eGreedyTut
+from GridMDPTut import GridMDPTut
 
 def make_experiment(exp_id=1, path="./Results/Tutorial/gridworld-sarsa0"):
     """
@@ -36,8 +39,13 @@ def make_experiment(exp_id=1, path="./Results/Tutorial/gridworld-sarsa0"):
     ## Domain:
     # maze = '4x5.txt'
     # domain = GridWorld(maze, noise=0.3)
-    chainSize = 20
-    domain = ChainMDPTut(chainSize=chainSize)
+
+    # chainSize = 20
+    # domain = ChainMDPTut(chainSize=chainSize)
+
+    gridSize = 5
+    domain = GridMDPTut(gridSize=gridSize)
+
     opt["domain"] = domain
 
     ## Representation
@@ -54,11 +62,21 @@ def make_experiment(exp_id=1, path="./Results/Tutorial/gridworld-sarsa0"):
     policy = eGreedyTut(representation, epsilon=0.2)
 
     ## Agent
-    opt["agent"] = SARSA0(representation=representation, policy=policy,
-                   discount_factor=domain.discount_factor,
-                       initial_learn_rate=0.1)
-    opt["checks_per_policy"] = 100
-    opt["max_steps"] = 2000
+    # opt["agent"] = SARSA0(representation=representation, policy=policy,
+    #                discount_factor=domain.discount_factor,
+    #                    initial_learn_rate=0.1)
+    # opt["agent"] = SARSA(representation=representation, policy=policy,
+    #                      discount_factor=domain.discount_factor,
+    #                      initial_learn_rate=0.1)
+    opt["agent"] = Q_Learning(representation=representation, policy=policy,
+                       discount_factor=domain.discount_factor,
+                       initial_learn_rate=0.1,
+                       learn_rate_decay_mode="boyan", boyan_N0=100,
+                       lambda_=0.)
+
+
+    opt["checks_per_policy"] = 10
+    opt["max_steps"] = 1000
     opt["num_policy_checks"] = 10
     experiment = Experiment(**opt)
     return experiment
