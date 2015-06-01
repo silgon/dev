@@ -8,21 +8,25 @@ placed it in the current working directory.
 Tests the agent on the GridWorld domain.
 """
 __author__ = "Robert H. Klein"
-from rlpy.Domains import GridWorld
-from rlpy.Representations import Tabular, RBF
-from rlpy.Policies import eGreedy
+from rlpy.Domains import GridWorld, PuddleWorld
+from rlpy.Representations import Tabular, RBF, Fourier
+from rlpy.Policies import eGreedy, GibbsPolicy
 from rlpy.Experiments import Experiment
-from rlpy.Agents import SARSA
-from rlpy.Agents import Q_Learning
+from rlpy.Agents import SARSA, Q_Learning, LSPI
 import os
 
+# Agent
 from SARSA0 import SARSA0
+# Representation
 from IncrTabularTut import IncrTabularTut
-from ChainMDPTut import ChainMDPTut
+# Policy
 from eGreedyTut import eGreedyTut
+# Domains
+from ChainMDPTut import ChainMDPTut
 from GridMDPTut import GridMDPTut
+from ContinuousTut import ContinuousTut
 
-def make_experiment(exp_id=1, path="./Results/Tutorial/gridworld-sarsa0"):
+def make_experiment(exp_id=1, path="./Results/results"):
     """
     Each file specifying an experimental setup should contain a
     make_experiment function which returns an instance of the Experiment
@@ -35,6 +39,9 @@ def make_experiment(exp_id=1, path="./Results/Tutorial/gridworld-sarsa0"):
     opt = {}
     opt["exp_id"] = exp_id
     opt["path"] = path
+    opt["checks_per_policy"] = 10
+    opt["max_steps"] = 50000
+    opt["num_policy_checks"] = 10
 
     ## Domain:
     # maze = '4x5.txt'
@@ -43,20 +50,28 @@ def make_experiment(exp_id=1, path="./Results/Tutorial/gridworld-sarsa0"):
     # chainSize = 20
     # domain = ChainMDPTut(chainSize=chainSize)
 
-    gridSize = 5
-    domain = GridMDPTut(gridSize=gridSize)
+    # gridSize = 5  # 5x5 grid
+    # domain = GridMDPTut(gridSize=gridSize)
+
+    # domain = PuddleWorld()
+
+    domain = ContinuousTut()
 
     opt["domain"] = domain
 
     ## Representation
     # discretization only needed for continuous state spaces, discarded otherwise
     # representation  = Tabular(domain, discretization=20)
-    representation  = IncrTabularTut(domain)
+    # representation  = IncrTabularTut(domain, discretization=40)
+
     # resolution=25.
     # num_rbfs=1000.
     # representation = RBF(domain, num_rbfs=int(num_rbfs),
     #                      resolution_max=resolution, resolution_min=resolution,
     #                      const_feature=False, normalize=True, seed=exp_id)
+
+    # representation = Fourier(domain, order=9)
+
     ## Policy
     # policy = eGreedy(representation, epsilon=0.2)
     policy = eGreedyTut(representation, epsilon=0.2)
@@ -74,10 +89,10 @@ def make_experiment(exp_id=1, path="./Results/Tutorial/gridworld-sarsa0"):
                        learn_rate_decay_mode="boyan", boyan_N0=100,
                        lambda_=0.)
 
+    # opt["agent"] = LSPI(policy, representation, domain.discount_factor,
+    #              opt["max_steps"], 1000)
 
-    opt["checks_per_policy"] = 10
-    opt["max_steps"] = 1000
-    opt["num_policy_checks"] = 10
+
     experiment = Experiment(**opt)
     return experiment
 
@@ -85,6 +100,7 @@ if __name__ == '__main__':
     experiment = make_experiment(1)
     experiment.run(visualize_steps=False,  # should each learning step be shown?
                    visualize_learning=True,  # show policy / value function?
-                   visualize_performance=1)  # show performance runs?
+                   visualize_performance=False)  # show performance runs?
+    experiment.performanceRun(500, visualize=True)
     experiment.plot()
-    experiment.save()
+    # experiment.save()

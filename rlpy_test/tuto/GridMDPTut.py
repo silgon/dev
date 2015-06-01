@@ -49,9 +49,3 @@ class GridMDPTut(Domain):
     def isTerminal(self):
         s = self.state
         return np.array_equal(s, self.goal)
-
-    def possibleActions(self, s=None):
-        possibleA = np.array([], np.uint8)
-        for a in xrange(self.actions_num):
-            possibleA = np.append(possibleA, [a])
-        return possibleA
