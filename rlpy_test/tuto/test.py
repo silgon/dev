@@ -70,7 +70,7 @@ def make_experiment(exp_id=1, path="./Results/results"):
     #                      resolution_max=resolution, resolution_min=resolution,
     #                      const_feature=False, normalize=True, seed=exp_id)
 
-    # representation = Fourier(domain, order=9)
+    representation = Fourier(domain, order=9)
 
     ## Policy
     # policy = eGreedy(representation, epsilon=0.2)

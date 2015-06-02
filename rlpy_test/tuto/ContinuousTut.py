@@ -60,10 +60,10 @@ class ContinuousTut(Domain):
         self.val_map = np.zeros(self.X.shape)
         self.pi_map = np.zeros(self.X.shape)
 
-        for i in xrange(X.shape[0]):
-            for j in xrange(X.shape[1]):
-                s = np.array([Y[i, j], X[i, j]])
-                self.reward_map[j, i] = self._reward(s)
+        for i in xrange(X.shape[1]):
+            for j in xrange(X.shape[0]):
+                s = np.array([X[i, j], Y[i, j]])
+                self.reward_map[i, j] = self._reward(s)
 
 
     def s0(self):
