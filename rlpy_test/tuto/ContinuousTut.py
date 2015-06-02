@@ -67,8 +67,8 @@ class ContinuousTut(Domain):
 
 
     def s0(self):
-        # values [-10, 10]
-        self.state = self.random_state.rand(2)*20-10
+        mult = np.max(self.statespace_limits, 1) - np.min(self.statespace_limits, 1)
+        self.state = self.random_state.rand(2)*mult-mult/2
         return self.state.copy(), self.isTerminal(), self.possibleActions()
 
     def isTerminal(self, s=None):
@@ -121,15 +121,15 @@ class ContinuousTut(Domain):
 
     def showLearning(self, representation):
         X, Y = self.X, self.Y
-        for i in xrange(X.shape[0]):
-            for j in xrange(X.shape[1]):
+        for i in xrange(X.shape[1]):
+            for j in xrange(X.shape[0]):
                 s = np.array([X[i, j], Y[i, j]])
-                self.val_map[j, i] = \
+                self.val_map[i, j] = \
                     representation.V(
                         s,
                         self.isTerminal(s),
                         self.possibleActions(s))
-                self.pi_map[j, i] = \
+                self.pi_map[i, j] = \
                     representation.bestAction(
                         s,
                         self.isTerminal(s),
