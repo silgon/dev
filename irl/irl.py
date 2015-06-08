@@ -75,21 +75,27 @@ def featureExpectations(P, pi, discount=0.9):
     """
     S = P.shape[0]
     A = P.shape[2]
-    ## x = dot(inv(A),y)
-    A = np.ones((S,S))
+    # x = dot(inv(A),y)
+    A = np.zeros((S, S))
+    A += np.diag(np.ones(S))
+    # it was working just fine with next line but t was bigger
+    # A = np.ones((S, S))
     for s in xrange(S):
-        A[s, s] = A[s, s]+1;
         a = pi[s]
         for sp in xrange(S):
             A[sp, s] = A[sp, s] - discount*P[s, sp, a]
-    return np.dot(np.linalg.inv(A), np.ones((S, 1))/S).ravel()
+    # next step performs apparently better than original (next commented line)
+    # np.dot(np.linalg.inv(A), np.ones((S, 1))/S).ravel()
+    expectation = np.dot(np.linalg.inv(A), np.ones((S, 1))).ravel()
+    exp_normalized = expectation/np.sum(expectation)
+    return exp_normalized
 
 
 def IRL(P, demos_s, demos_a, discount=0.9):
     """
     Apprenticeship Learning
     """
-    # State Expectations
+    # \mu_E construction
     S = P.shape[0]
     N = len(demos_s)
     muE = np.zeros(S)
@@ -97,8 +103,7 @@ def IRL(P, demos_s, demos_a, discount=0.9):
         for t in xrange(len(demos_s[i])):
             muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**(t-1)
     muE = muE/N
-    # TODO(silgon): convert to features
-    # Tabular, IncTabular, Fourier, RBF
+    # TODO(silgon): check features
     # Random Policy
     r = np.random.rand(S)  # states / use features later
     soln = valueIteration(P, r)
@@ -176,7 +181,6 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     # because features and same as states
     r = w
     V, pi = valueIteration(P, w)
-    # print(solutions)
     return dict(r=r, V=V, pi=pi)
 
 
