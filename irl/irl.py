@@ -103,7 +103,7 @@ def IRL(P, demos_s, demos_a, discount=0.9):
         for t in xrange(len(demos_s[i])):
             muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**(t-1)
     muE = muE/N
-    # TODO(silgon): check features
+    # TODO(silgon): verify feature space
     # Random Policy
     r = np.random.rand(S)  # states / use features later
     soln = valueIteration(P, r)
@@ -116,53 +116,50 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     # Initialize t.
     t = 100.0
     told = 0.0
-
-    while True:
+    epsilon = 0.0001
+    # quit while loop if difference in t is little
+    while abs(t-told) >= epsilon:
         told = t
         # compute expectations under last policy
         expectations = featureExpectations(P, solutions[itr][1])
-        # TODO(silgon): convert to features
+        # TODO(silgon): verify feature space
         mu = expectations  # features are the states
         # append mus
         mus.append(mu)
         if itr == 0:
-            mu_bars.append(mu)
-            mu_bar = mu_bars[itr]
-            w = muE - mu_bar
-            t = np.linalg.norm(w)
+            mu_bar = mu
         else:
             mu_bar_prev = mu_bars[itr-1]
             num = np.sum((mu-mu_bar_prev)*(muE-mu_bar_prev))
             den = np.sum((mu-mu_bar_prev)*(mu-mu_bar_prev))
             ratio = num/den
             mu_bar = mu_bar_prev + ratio*(mu-mu_bar)
-            w = muE - mu_bar
-            t = np.linalg.norm(muE - mu_bar)
-            mu_bars.append(mu_bar)
+        # compute weights and t
+        mu_bars.append(mu_bar)
+        w = muE - mu_bar
+        t = np.linalg.norm(w)
         # Recompute optimal policy using new weights.
-        # remap features
         soln = valueIteration(P, w)
+        # add to list of weights and solutions
         weights.append(w)
         solutions.append(soln)
         itr += 1  # number of mus until now
-        # quit while loop if difference in t is little
         print("IRL iteration with t=", t)
-        if abs(t-told) <= 0.0001:
-            break
+
     # compute last policy
     expectations = featureExpectations(P, solutions[itr][1])
     itr += 1  # consistency with number of mus
-    # TODO(silgon): convert to features
+    # TODO(silgon): verify feature space
     mu = expectations  # features are the states
     mus.append(mu)
-    # for i in xrange(len(solutions)):
-    #     print(solutions[i][1])
+
+    # create mu_mat matrix for optimization step
     mu_mat = np.zeros((S, itr))
     for i in xrange(itr):
         mu_mat[:, i] = mus[i]
 
     import cvxpy as cvx
-    # Construct the problem.
+    # Construct optimization problem.
     mu = cvx.Variable(S)
     lambd = cvx.Variable(itr)
     objective = cvx.Minimize(cvx.sum_squares(muE-mu))
@@ -175,7 +172,7 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     # result = prob.solve(verbose=True)
     prob.solve(verbose=False)
 
-    # create weights based on lambdas
+    # create weights based on lambdas and mu_mat matrix
     w = np.dot(np.atleast_2d(lambd.value).T, mu_mat.T)
     w = np.ravel(w)  # for some reason w.ravel() is not working
     # because features and same as states
