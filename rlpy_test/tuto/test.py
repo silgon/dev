@@ -25,6 +25,7 @@ from eGreedyTut import eGreedyTut
 from ChainMDPTut import ChainMDPTut
 from GridMDPTut import GridMDPTut
 from ContinuousTut import ContinuousTut
+from ChainContinuous import ChainContinuous
 
 def make_experiment(exp_id=1, path="./Results/results"):
     """
@@ -55,7 +56,9 @@ def make_experiment(exp_id=1, path="./Results/results"):
 
     # domain = PuddleWorld()
 
-    domain = ContinuousTut()
+    # domain = ContinuousTut()
+    domain = ChainContinuous()
+
 
     opt["domain"] = domain
 
@@ -64,13 +67,13 @@ def make_experiment(exp_id=1, path="./Results/results"):
     # representation  = Tabular(domain, discretization=20)
     # representation  = IncrTabularTut(domain, discretization=40)
 
-    # resolution=25.
-    # num_rbfs=1000.
-    # representation = RBF(domain, num_rbfs=int(num_rbfs),
-    #                      resolution_max=resolution, resolution_min=resolution,
-    #                      const_feature=False, normalize=True, seed=exp_id)
+    resolution=25.
+    num_rbfs=1000.
+    representation = RBF(domain, num_rbfs=int(num_rbfs),
+                         resolution_max=resolution, resolution_min=resolution,
+                         const_feature=False, normalize=True, seed=exp_id)
 
-    representation = Fourier(domain, order=9)
+    # representation = Fourier(domain, order=9)
 
     ## Policy
     # policy = eGreedy(representation, epsilon=0.2)
@@ -99,7 +102,7 @@ def make_experiment(exp_id=1, path="./Results/results"):
 if __name__ == '__main__':
     experiment = make_experiment(1)
     experiment.run(visualize_steps=False,  # should each learning step be shown?
-                   visualize_learning=True,  # show policy / value function?
+                   visualize_learning=False,  # show policy / value function?
                    visualize_performance=False)  # show performance runs?
     experiment.performanceRun(500, visualize=True)
     experiment.plot()

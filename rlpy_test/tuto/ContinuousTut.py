@@ -51,7 +51,7 @@ class ContinuousTut(Domain):
         super(ContinuousTut, self).__init__()
 
         side_x = np.linspace(self.statespace_limits[0, 0],
-                             self.statespace_limits[0, 1],100)
+                             self.statespace_limits[0, 1], 100)
         side_y = np.linspace(self.statespace_limits[1, 0],
                              self.statespace_limits[1, 1], 100)
         X, Y = np.meshgrid(side_x, side_y)
@@ -65,7 +65,6 @@ class ContinuousTut(Domain):
                 s = np.array([X[i, j], Y[i, j]])
                 self.reward_map[i, j] = self._reward(s)
 
-
     def s0(self):
         mult = np.max(self.statespace_limits, 1) - np.min(self.statespace_limits, 1)
         self.state = self.random_state.rand(2)*mult-mult/2
@@ -74,7 +73,7 @@ class ContinuousTut(Domain):
     def isTerminal(self, s=None):
         if s is None:
             s = self.state
-        return 4.5 < s[0] < 5.5 and -1 < s[1] < 1
+        return 4.5 < s[0] < 5.5 and -.5 < s[1] < .5
 
     def possibleActions(self, s=0):
         return np.arange(self.actions_num)
@@ -99,11 +98,11 @@ class ContinuousTut(Domain):
 
     def _reward(self, s):
         if self.isTerminal(s):
-            return 0  # goal state reached
-        reward = -(s[0]-4)**2 - 10*s[1]**2
-        if reward < -100:
-            reward = -100
-        return reward
+            return 1  # goal state reached
+        # reward = -(s[0]-4)**2 - 10*s[1]**2
+        # if reward < -100:
+        #     reward = -100
+        return 0
 
     # def showDomain(self, a=None):
     #     s = self.state
