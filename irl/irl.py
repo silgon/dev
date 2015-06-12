@@ -94,6 +94,35 @@ def featureExpectations(P, pi, discount=0.9):
     return exp_normalized
 
 
+def featureExpectations2(P, pi, N_Demos=100, discount=0.9):
+    """
+    Feature Expectations based on States and policy (pi)
+    """
+    S = P.shape[0]
+    start = np.random.randint(0, S, N_Demos)
+    demos_s = []
+    demos_a = []
+    for s in start:
+        ss = []
+        aa = []
+        iters = 0
+        while True:
+            ss.append(s)
+            aa.append(pi[s])
+            if R[s] == np.max(R) or iters==40:
+                break
+            s = np.argmax(P[s, :, pi[s]])
+            iters += 1
+        demos_s.append(ss)
+        demos_a.append(aa)
+    mu_k = np.zeros(S)
+    for i in xrange(N_Demos):
+        for t in xrange(len(demos_s[i])):
+            mu_k[demos_s[i][t]] = mu_k[demos_s[i][t]] + discount**t
+    mu_k = mu_k/N_Demos
+    return mu_k
+
+
 def IRL(P, demos_s, demos_a, discount=0.9):
     """
     Apprenticeship Learning
@@ -124,7 +153,7 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     while abs(t-told) >= epsilon:
         told = t
         # compute expectations under last policy
-        expectations = featureExpectations(P, solutions[itr][1])
+        expectations = featureExpectations2(P, solutions[itr][1])
         # TODO(silgon): verify feature space
         mu = expectations  # features are the states
         # append mus
@@ -150,7 +179,7 @@ def IRL(P, demos_s, demos_a, discount=0.9):
         print("IRL iteration with t=", t)
 
     # compute last policy
-    expectations = featureExpectations(P, solutions[itr][1])
+    expectations = featureExpectations2(P, solutions[itr][1])
     itr += 1  # consistency with number of mus
     # TODO(silgon): verify feature space
     mu = expectations  # features are the states
