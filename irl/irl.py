@@ -17,7 +17,6 @@ def linearMDP(S=5, goal=3):
     R[goal] = 1
     return P, R
 
-
 def valueIteration(P, R, gamma=0.9, max_iter=1000):
     """
     Solves the Policy Iteration given the transition matrix and Rewards
@@ -36,7 +35,10 @@ def valueIteration(P, R, gamma=0.9, max_iter=1000):
             for j in xrange(A):
                 # sum_{s'} p(s'|s,a)[r(s,a,s')+\gamma v(s')]
                 Q[i, j] = np.sum([P[i, k, j]*(R[k] + gamma*V[k])
+                                  if not P[i, k, j] == 0 else 0
                                   for k in xrange(S)])
+                # Q[i, j] = np.sum([P[i, k, j]*(R[k] + gamma*V[k])
+                #                   for k in xrange(S)])
             # max of Q is V
             V[i] = np.max(Q[i, :])
             delta = max(delta, abs(tmp-V[i]))
@@ -74,7 +76,6 @@ def featureExpectations(P, pi, discount=0.9):
     Feature Expectations based on States and policy (pi)
     """
     S = P.shape[0]
-    A = P.shape[2]
     # x = dot(inv(A),y)
     A = np.zeros((S, S))
     A += np.diag(np.ones(S))
@@ -83,9 +84,11 @@ def featureExpectations(P, pi, discount=0.9):
     for s in xrange(S):
         a = pi[s]
         for sp in xrange(S):
+            if P[s, sp, a] == 0:
+                continue
             A[sp, s] = A[sp, s] - discount*P[s, sp, a]
     # next step performs apparently better than original (next commented line)
-    # np.dot(np.linalg.inv(A), np.ones((S, 1))/S).ravel()
+    # return np.dot(np.linalg.inv(A), np.ones((S, 1))/S).ravel()
     expectation = np.dot(np.linalg.inv(A), np.ones((S, 1))).ravel()
     exp_normalized = expectation/np.sum(expectation)
     return exp_normalized
@@ -101,7 +104,7 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     muE = np.zeros(S)
     for i in xrange(N):
         for t in xrange(len(demos_s[i])):
-            muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**(t-1)
+            muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**t
     muE = muE/N
     # TODO(silgon): verify feature space
     # Random Policy
