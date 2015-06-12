@@ -1,11 +1,28 @@
 #! /usr/bin/python
+"""
+Simple example for IRL based on apprenticeship learning
+"""
 from __future__ import print_function
 import numpy as np
 
 
 def linearMDP(S=5, goal=3):
     """
-    Linear MDP with 3 actions, [-1, 0, +1]
+    Chain MDP with 3 actions, [-1, 0, +1]
+
+    Parameters
+    =========
+    S: int
+        Size of the chain
+    goal: int
+        where the reward is 1, for all the rest reward is zero
+
+    Returns
+    =======
+    P: np.array of size SxSx3
+        Transition matrix
+    R: np.array of size S
+        Reward matrix
     """
     # Probability Matrix
     P = np.zeros((S, S, 3))
@@ -20,6 +37,24 @@ def linearMDP(S=5, goal=3):
 def valueIteration(P, R, gamma=0.9, max_iter=1000):
     """
     Solves the Policy Iteration given the transition matrix and Rewards
+
+    Parameters
+    ==========
+    P: np.array of size SxSx3
+        Transition matrix
+    R: np.array of size S
+        Reward matrix
+    gamma: float
+        discount factor
+    max_iter: int
+        maximum number of iterations
+
+    Returns
+    =======
+    V: np.array of size S
+        Expected values of the states
+    pi: np.array of size S
+        best policy for every state
     """
     S = P.shape[0]
     A = P.shape[2]
@@ -53,6 +88,27 @@ def valueIteration(P, R, gamma=0.9, max_iter=1000):
 
 
 def createRandomDemos(N_Demos, P, R, pi):
+    """
+    Create demonstrations to use with the IRL algorithm
+
+    Parameters
+    ==========
+    N_Demos: int
+        number of demonstrations you want for the IRL
+    P: np.array of size SxSx3
+        Transition matrix
+    R: np.array of size S
+        Reward matrix
+    pi: np.array of size S
+        best policy for every state
+
+    Returns
+    ======
+    demos_s: list of lists
+        all the states in which the agent was
+    demos_a: list of lists
+        all actions that the agent performed
+    """
     S = P.shape[0]
     start = np.random.randint(0, S, N_Demos)
     demos_s = []
@@ -74,6 +130,20 @@ def createRandomDemos(N_Demos, P, R, pi):
 def featureExpectations(P, pi, discount=0.9):
     """
     Feature Expectations based on States and policy (pi)
+
+    Parameters
+    ==========
+    P: np.array of size SxSx3
+        Transition matrix
+    pi: np.array of size S
+        best policy for every state
+    discount: float
+        discount factor
+
+    Returns
+    ======
+    exp_normalized: np.array of size S
+        feature expectations given the policy pi
     """
     S = P.shape[0]
     # x = dot(inv(A),y)
@@ -94,9 +164,24 @@ def featureExpectations(P, pi, discount=0.9):
     return exp_normalized
 
 
-def featureExpectations2(P, pi, N_Demos=100, discount=0.9):
+def featureExpectations2(P, pi, N_Demos=100, max_steps=40,discount=0.9):
     """
     Feature Expectations based on States and policy (pi)
+    (Another computation method)
+
+    Parameters
+    ==========
+    P: np.array of size SxSx3
+        Transition matrix
+    pi: np.array of size S
+        best policy for every state
+    discount: float
+        discount factor
+
+    Returns
+    ======
+    exp_normalized: np.array of size S
+        feature expectations given the policy pi
     """
     S = P.shape[0]
     start = np.random.randint(0, S, N_Demos)
@@ -106,13 +191,13 @@ def featureExpectations2(P, pi, N_Demos=100, discount=0.9):
         ss = []
         aa = []
         iters = 0
-        while True:
+        for _ in xrange(max_steps):
             ss.append(s)
             aa.append(pi[s])
-            if R[s] == np.max(R) or iters==40:
-                break
             s = np.argmax(P[s, :, pi[s]])
             iters += 1
+            # we could add an if something to beak the loop
+            # like repeated states
         demos_s.append(ss)
         demos_a.append(aa)
     mu_k = np.zeros(S)
@@ -126,6 +211,26 @@ def featureExpectations2(P, pi, N_Demos=100, discount=0.9):
 def IRL(P, demos_s, demos_a, discount=0.9):
     """
     Apprenticeship Learning
+
+    Parameters
+    ==========
+    P: np.array of size SxSx3
+        Transition matrix
+    demos_s: list of lists
+        all the states in which the agent was
+    demos_a: list of lists
+        all actions that the agent performed
+    discount: float
+        discount factor
+
+    Returns
+    ======
+    r: np.array of size S
+        Reward of every state
+    V: np.array of size S
+        Expected values of the states
+    pi: np.array of size S
+        best policy for every state
     """
     # \mu_E construction
     S = P.shape[0]
@@ -135,7 +240,6 @@ def IRL(P, demos_s, demos_a, discount=0.9):
         for t in xrange(len(demos_s[i])):
             muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**t
     muE = muE/N
-    # TODO(silgon): verify feature space
     # Random Policy
     r = np.random.rand(S)  # states / use features later
     soln = valueIteration(P, r)
@@ -154,7 +258,6 @@ def IRL(P, demos_s, demos_a, discount=0.9):
         told = t
         # compute expectations under last policy
         expectations = featureExpectations2(P, solutions[itr][1])
-        # TODO(silgon): verify feature space
         mu = expectations  # features are the states
         # append mus
         mus.append(mu)
@@ -181,7 +284,6 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     # compute last policy
     expectations = featureExpectations2(P, solutions[itr][1])
     itr += 1  # consistency with number of mus
-    # TODO(silgon): verify feature space
     mu = expectations  # features are the states
     mus.append(mu)
 
@@ -215,6 +317,7 @@ def IRL(P, demos_s, demos_a, discount=0.9):
 
 
 if __name__ == '__main__':
+    """ Main Program """
     np.random.seed(0)
     # Create MDP
     N_States = 40
