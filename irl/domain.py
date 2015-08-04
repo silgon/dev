@@ -52,17 +52,16 @@ def createRandomDemos(N_Demos, P, R, pi):
     """
     S = P.shape[0]
     start = np.random.randint(0, S, N_Demos)
-    demos_s = []
-    demos_a = []
+    demos = []
     for s in start:
-        ss = []
-        aa = []
+        ss = []  # chain of states
+        aa = []  # chain of actions
         while True:
             ss.append(s)
             aa.append(pi[s])
             if R[s] == np.max(R):
                 break
             s = np.argmax(P[s, :, pi[s]])
-        demos_s.append(ss)
-        demos_a.append(aa)
-    return demos_s, demos_a
+        demo = zip(ss, aa)
+        demos.append(demo)
+    return demos

@@ -20,8 +20,7 @@ if __name__ == '__main__':
     V, pi = valueIteration(P, R)
     # Create Examples state-actions pairs
     N_Demos = 10
-    demos_s, demos_a = createRandomDemos(N_Demos, P, R, pi)
-    # print(demos_s)
-    # print(demos_a)
-    irl = IRL(P, demos_s, demos_a, 0.9)
+    demos = createRandomDemos(N_Demos, P, R, pi)
+    # print(demos)
+    irl = IRL(P, demos, 0.9)
     # print(irl)

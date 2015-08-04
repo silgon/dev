@@ -2,7 +2,7 @@ import numpy as np
 from mdp import valueIteration
 from feature_expectations import *
 
-def IRL(P, demos_s, demos_a, discount=0.9):
+def IRL(P, demos, discount=0.9):
     """
     Apprenticeship Learning
 
@@ -10,10 +10,8 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     ==========
     P: np.array of size SxSx3
         Transition matrix
-    demos_s: list of lists
-        all the states in which the agent was
-    demos_a: list of lists
-        all actions that the agent performed
+    demos: list of lists [[[state, action],...],...]
+        all state-actions that the agent performed
     discount: float
         discount factor
 
@@ -28,11 +26,11 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     """
     # \mu_E construction
     S = P.shape[0]
-    N = len(demos_s)
+    N = len(demos)
     muE = np.zeros(S)
     for i in xrange(N):
-        for t in xrange(len(demos_s[i])):
-            muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**t
+        for t in xrange(len(demos[i])):
+            muE[demos[i][t][0]] = muE[demos[i][t][0]] + discount**t
     muE = muE/N
     # Random Policy
     r = np.random.rand(S)  # states / use features later
@@ -108,5 +106,43 @@ def IRL(P, demos_s, demos_a, discount=0.9):
     V, pi = valueIteration(P, w)
     return dict(r=r, V=V, pi=pi)
 
-def IRL(P, demos_s, demos_a, discount=0.9):
-     raise NotImplementedError
+def BIRL(P, demos, discount=0.9):
+    """
+    Bayesian IRL
+
+    Parameters
+    ==========
+    P: np.array of size SxSx3
+        Transition matrix
+    demos_s: list of lists
+        all the states in which the agent was
+    demos_a: list of lists
+        all actions that the agent performed
+    discount: float
+        discount factor
+
+    Returns
+    ======
+    r: np.array of size S
+        Reward of every state
+    V: np.array of size S
+        Expected values of the states
+    pi: np.array of size S
+        best policy for every state
+    """
+    # \mu_E construction
+    S = P.shape[0]
+    N = len(demos_s)
+    muE = np.zeros(S)
+    for i in xrange(N):
+        for t in xrange(len(demos_s[i])):
+            muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**t
+    muE = muE/N
+    # Random Policy
+    r = np.random.rand(S)  # states / use features later
+    soln = valueIteration(P, r)
+    weights = [r]
+    solutions = [soln]
+    mus = []
+    mu_bars = []
+    itr = 0
