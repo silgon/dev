@@ -21,6 +21,8 @@ def valueIteration(P, R, discount=0.9, max_iter=1000):
         Expected values of the states
     pi: np.array of size S
         best policy for every state
+    Q: np.array of size SxA
+        Q values
     """
     S = P.shape[0]
     A = P.shape[2]
@@ -50,4 +52,4 @@ def valueIteration(P, R, discount=0.9, max_iter=1000):
             break
     # get policy from Q
     pi = np.argmax(Q, 1)
-    return V, pi
+    return V, pi, Q

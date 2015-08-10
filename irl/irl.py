@@ -103,8 +103,8 @@ def IRL(P, demos, discount=0.9):
     w = np.ravel(w)  # for some reason w.ravel() is not working
     # because features and same as states
     r = w
-    V, pi = valueIteration(P, w)
-    return dict(r=r, V=V, pi=pi)
+    V, pi, Q = valueIteration(P, w)
+    return dict(r=r, V=V, pi=pi, Q=Q)
 
 def BIRL(P, demos, discount=0.9):
     """
@@ -114,10 +114,8 @@ def BIRL(P, demos, discount=0.9):
     ==========
     P: np.array of size SxSx3
         Transition matrix
-    demos_s: list of lists
-        all the states in which the agent was
-    demos_a: list of lists
-        all actions that the agent performed
+    demos: list of lists
+        discount factor
     discount: float
         discount factor
 
@@ -130,19 +128,24 @@ def BIRL(P, demos, discount=0.9):
     pi: np.array of size S
         best policy for every state
     """
-    # \mu_E construction
+    from sklearn.metrics import zero_one_loss
+
     S = P.shape[0]
-    N = len(demos_s)
-    muE = np.zeros(S)
-    for i in xrange(N):
-        for t in xrange(len(demos_s[i])):
-            muE[demos_s[i][t]] = muE[demos_s[i][t]] + discount**t
-    muE = muE/N
-    # Random Policy
-    r = np.random.rand(S)  # states / use features later
-    soln = valueIteration(P, r)
-    weights = [r]
-    solutions = [soln]
-    mus = []
-    mu_bars = []
-    itr = 0
+    N = len(demos)
+
+    max_walk_iter =  500
+    burn_ratio = 30
+    step_size = 0.4
+    r = np.random.rand(S)  
+    V, pi, Q = valueIteration(P, r)
+
+    burn_point = int(max_walk_iter * burn_ratio / 100)
+    walk_iteration = 1
+
+    while walk_iteration < max_walk_iter:
+        # pick a reward vector uniformly from neighbors of current reward
+        # compute new reward
+        new_reward = reward.copy()
+        state = np.random.randint(0, S)  # random state
+        new_reward[state] = np.random.choice([-step_size, step_size])
+

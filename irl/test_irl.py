@@ -17,7 +17,7 @@ if __name__ == '__main__':
     N_States = 40
     P, R = linearMDP(N_States, 2)
     # Solve MDP
-    V, pi = valueIteration(P, R)
+    V, pi, Q = valueIteration(P, R)
     # Create Examples state-actions pairs
     N_Demos = 10
     demos = createRandomDemos(N_Demos, P, R, pi)
