@@ -23,4 +23,4 @@ if __name__ == '__main__':
     demos = createRandomDemos(N_Demos, P, R, pi)
     # print(demos)
     irl = IRL(P, demos, 0.9)
-    # print(irl)
+    print(irl)

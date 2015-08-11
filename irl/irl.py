@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 from mdp import valueIteration
 from feature_expectations import *
@@ -105,50 +106,3 @@ def IRL(P, demos, discount=0.9):
     r = w
     V, pi, Q = valueIteration(P, w)
     return dict(r=r, V=V, pi=pi, Q=Q)
-
-def BIRL(P, demos, discount=0.9, rmax=2):
-    """
-    Bayesian IRL
-
-    Parameters
-    ==========
-    P: np.array of size SxSx3
-        Transition matrix
-    demos: list of lists
-        discount factor
-    discount: float
-        discount factor
-
-    Returns
-    ======
-    r: np.array of size S
-        Reward of every state
-    V: np.array of size S
-        Expected values of the states
-    pi: np.array of size S
-        best policy for every state
-    """
-    from sklearn.metrics import zero_one_loss
-    is_uniform = True
-    S = P.shape[0]
-    N = len(demos)
-
-    max_walk_iter =  500
-    burn_ratio = 30
-    step_size = 0.4
-    reward = np.random.rand(S)  
-    V, pi, Q = valueIteration(P, reward)
-
-    burn_point = int(max_walk_iter * burn_ratio / 100)
-    walk_iteration = 1
-    while walk_iteration < max_walk_iter:
-        # pick a reward vector uniformly from neighbors of current reward
-        # compute new reward
-        new_reward = reward.copy()
-        state = np.random.randint(0, S)  # random state
-        # change this for uniform and non uniform distribution
-        change = np.random.choice([-step_size, step_size])
-        if (reward[state] + change) < rmax and\
-           (reward[state] + change) > -rmax:
-            new_reward[state] += change
-        new_V, new_pi, new_Q = valueIteration(P, new_reward)
