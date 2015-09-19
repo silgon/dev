@@ -1,14 +1,5 @@
-
-ifndef CPPC
-	CPPC=g++
-endif
-
-# CPP_COMMON = ../../Cpp_common
-
+CC=g++
 CCFLAGS=
-
-# INC = -I $(CPP_COMMON)
-
 LIBS = -lOpenCL -lrt
 
 # Change this variable to specify the device type
@@ -22,7 +13,7 @@ endif
 # and set up the right compiler flags and libraries
 PLATFORM = $(shell uname -s)
 ifeq ($(PLATFORM), Darwin)
-	CPPC = clang++
+	CC = clang++
 	CCFLAGS += -stdlib=libc++
 	LIBS = -framework OpenCL
 endif
@@ -30,8 +21,7 @@ endif
 CCFLAGS += -D DEVICE=$(DEVICE)
 
 main: main.cpp
-	$(CPPC) $^ $(CCFLAGS) $(LIBS) -o $@
-
+	$(CC) $^ $(CCFLAGS) $(LIBS) -o $@
 
 clean:
-	rm -f vadd_chain
+	rm -f main
