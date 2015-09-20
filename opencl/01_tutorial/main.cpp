@@ -1,102 +1,54 @@
-#define __CL_ENABLE_EXCEPTIONS
+#include "cll.hpp"
 
-#include "CL/cl.hpp"
-
-#include <vector>
-#include <cstdio>
-#include <cstdlib>
-#include <string>
-
-#include <iostream>
-#include <fstream>
-
-// pick up device type from compiler command line or from the default type
-#ifndef DEVICE
-#define DEVICE CL_DEVICE_TYPE_DEFAULT
-#endif
-
-#ifndef CL_SOURCE_DIR
-#define CL_SOURCE_DIR ""
-#endif
-
-//------------------------------------------------------------------------------
-
-#define LENGTH (10)    // length of vectors a, b, and c
-
-inline std::string loadProgram(std::string input)
+class myAlgo: public CL
 {
-    std::string filepath;
-    // if created with make file
-    if(CL_SOURCE_DIR == "")
-        filepath = input;
-    // if created with CMakeLists.txt file
-    else
-        filepath = static_cast<std::string>(CL_SOURCE_DIR) +"/" + input;
-
-    std::ifstream stream(filepath.c_str());
-    if (!stream.is_open()) {
-        std::cout << "Cannot open file: " << filepath << std::endl;
-        exit(1);
+public:
+    myAlgo(std::string clfile):CL(clfile){
     }
-    return std::string(std::istreambuf_iterator<char>(stream),
-                       (std::istreambuf_iterator<char>()));
-}
+    virtual void runAlgo();
+    virtual ~myAlgo(){}
+};
 
-int main(void) {
-    std::vector<float> v_a(LENGTH);                // a vector 
-    std::vector<float> v_b(LENGTH);                // b vector 	
-    std::vector<float> v_c (LENGTH);   // c vector (result)
+void myAlgo::runAlgo(){
+    int length = 10;
+    std::vector<float> v_a(length);
+    std::vector<float> v_b(length);
+    std::vector<float> v_c (length);
 
-    cl::Buffer d_a;                       // device memory used for the input  a vector
-    cl::Buffer d_b;                       // device memory used for the input  b vector
-    cl::Buffer d_c;                       // device memory used for the output c vector
+    cl::Buffer d_a;
+    cl::Buffer d_b;
+    cl::Buffer d_c;
 
-    // Fill vectors a and b with random float values
-    int count = LENGTH;
+    int count = length;
     for(int i = 0; i < count; i++) {
         v_a[i]  = i;
         v_b[i]  = i;
     }
 
-    try {
-    	// Create a context
-        cl::Context context(DEVICE);
+    cl::make_kernel<cl::Buffer, cl::Buffer, cl::Buffer> vadd(program, "vadd");
 
-        // Load in kernel source, creating a program object for the context
+    d_a = cl::Buffer(context, v_a.begin(), v_a.end(), true);
+    d_b = cl::Buffer(context, v_b.begin(), v_b.end(), true);
+    d_c = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(float) * length);
 
-        cl::Program program(context, loadProgram("vector_add.cl"), true);
+    vadd(cl::EnqueueArgs(queue,cl::NDRange(count)),
+         d_a, d_b, d_c);
 
-        // Get the command queue
-        cl::CommandQueue queue(context);
-
-        // Create the kernel functor
- 
-        cl::make_kernel<cl::Buffer, cl::Buffer, cl::Buffer> vadd(program, "vadd");
-
-        d_a = cl::Buffer(context, v_a.begin(), v_a.end(), true);
-        d_b = cl::Buffer(context, v_b.begin(), v_b.end(), true);
-        d_c = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(float) * LENGTH);
-
-        vadd(
-             cl::EnqueueArgs(
-                             queue,
-                             cl::NDRange(count)),
-             d_a,
-             d_b,
-             d_c);
-
-        cl::copy(queue, d_c, v_c.begin(), v_c.end());
-        std::cout << "c: ";
-        for (int i = 0; i < count; i++) {
-            std::cout << v_c[i] << ", ";
-        }
-        std::cout << "\n";
+    cl::copy(queue, d_c, v_c.begin(), v_c.end());
+    std::cout << "c: ";
+    for (int i = 0; i < count; i++) {
+        std::cout << v_c[i] << ", ";
     }
-    catch (cl::Error err) {
-        std::cout << "Exception\n";
-        std::cerr 
-            << "ERROR: "
-            << err.what()
-            << std::endl;
-    }
+    std::cout << "\n";
+
+}
+
+int main(int argc, char *argv[])
+{
+    std::string clfile = "vector_add.cl";
+    myAlgo example(clfile);
+    // example.loadProgram("vector_add.cl");
+    example.runAlgo();
+    
+    return 0;
 }
