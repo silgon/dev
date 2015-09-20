@@ -29,6 +29,10 @@ public:
     CL(std::string clfile): context(DEVICE), queue(context),
           program(context, readFile(clfile), true){}
     virtual ~CL(){}
+    template <class T>
+    void vectToBuffer(T & in, cl::Buffer & out){
+        out = cl::Buffer(context, in.begin(), in.end(), true);
+    }
     virtual void runAlgo(){
         std::cout << "Not Implemented function runAlgo" << "\n";
         std::exit(0);

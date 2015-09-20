@@ -26,9 +26,8 @@ void myAlgo::runAlgo(){
     }
 
     cl::make_kernel<cl::Buffer, cl::Buffer, cl::Buffer> vadd(program, "vadd");
-
-    d_a = cl::Buffer(context, v_a.begin(), v_a.end(), true);
-    d_b = cl::Buffer(context, v_b.begin(), v_b.end(), true);
+    vectToBuffer(v_a, d_a);
+    vectToBuffer(v_b, d_b);
     d_c = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(float) * length);
 
     vadd(cl::EnqueueArgs(queue,cl::NDRange(count)),
