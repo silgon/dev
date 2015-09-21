@@ -50,7 +50,7 @@ __kernel void mmul2(
 }
 
 // everything running in local
-#define blksz 16
+#define blksz 10
 __kernel void mmul3(
                 const unsigned int             N,
                 __global const float* restrict A,
