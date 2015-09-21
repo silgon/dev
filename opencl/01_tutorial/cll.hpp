@@ -23,16 +23,38 @@ class CL
 {
 public:
     cl::Context context;
-    cl::Program program;
+    cl::Program clprogram;
     cl::CommandQueue queue;
-
+    /*
+      Initialize the name of the opencl file in order with several
+      convinient functions
+    */
     CL(std::string clfile): context(DEVICE), queue(context),
-          program(context, readFile(clfile), true){}
+          clprogram(context, readFile(clfile), true){}
     virtual ~CL(){}
+    /*
+      Convert a vector to a buffer
+     */
     template <class T>
     void vectToBuffer(T & in, cl::Buffer & out){
         out = cl::Buffer(context, in.begin(), in.end(), true);
     }
+    /*
+      Copy information from a buffer to a vector
+     */
+    template <class T>
+    void bufferToVect(cl::Buffer & in, T & out){
+        cl::copy(queue, in, out.begin(), out.end());
+    }
+    /*
+      Create an output buffer
+     */
+    cl::Buffer outBuffer(int length){
+        return cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(float) * length);
+    }
+    /*
+      run the main algorithm
+     */
     virtual void runAlgo(){
         std::cout << "Not Implemented function runAlgo" << "\n";
         std::exit(0);
