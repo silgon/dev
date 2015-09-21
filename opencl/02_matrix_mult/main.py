@@ -11,7 +11,7 @@ class myAlgo(CL):
         The program implementation
         """
         #initialize client side (CPU) arrays
-        N = 1024
+        N = 100
         A_VAL = .5
         B_VAL = 1
         size = N * N
@@ -38,9 +38,10 @@ class myAlgo(CL):
         print "{}".format(h_C)
 
         localmem = cl.LocalMemory(np.dtype(np.float32).itemsize * N)
+        n_blocks = 10
         mmul2 = self.program.mmul2
         mmul2.set_scalar_arg_dtypes([np.int32, None, None, None, None])
-        mmul2(self.queue, (N,), (1024/16,),
+        mmul2(self.queue, (N,), (N/n_blocks,),
               N, a_buf, b_buf, dest_buf, localmem)
         print "Second problem solved"
 
@@ -48,7 +49,7 @@ class myAlgo(CL):
         self.bufferToVect(dest_buf, h_C)
         print "{}".format(h_C)
 
-        blocksize = 16
+        blocksize = 10
         A_block = cl.LocalMemory(np.dtype(np.float32).itemsize*blocksize**2)
         B_block = cl.LocalMemory(np.dtype(np.float32).itemsize*blocksize**2)
         mmul3 = self.program.mmul3
