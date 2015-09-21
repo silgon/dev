@@ -1,0 +1,27 @@
+CC=g++
+CCFLAGS=
+LIBS = -lOpenCL -lrt
+
+# Change this variable to specify the device type
+# to the OpenCL device type of choice. You can also
+# edit the variable in the source.
+ifndef DEVICE
+	DEVICE = CL_DEVICE_TYPE_DEFAULT
+endif
+
+# Check our platform and make sure we define the APPLE variable
+# and set up the right compiler flags and libraries
+PLATFORM = $(shell uname -s)
+ifeq ($(PLATFORM), Darwin)
+	CC = clang++
+	CCFLAGS += -stdlib=libc++
+	LIBS = -framework OpenCL
+endif
+
+CCFLAGS += -D DEVICE=$(DEVICE)
+
+main: main.cpp
+	$(CC) $^ $(CCFLAGS) $(LIBS) -o $@
+
+clean:
+	rm -f main
