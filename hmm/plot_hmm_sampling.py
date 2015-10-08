@@ -33,10 +33,20 @@ model.covars_ = covars
 ###############################################################
 
 # Generate samples
-X, Z = model.sample(500)
+xdata, y = model.sample(500)
 
+# model2 = hmm.GaussianHMM(4, "full", start_prob, trans_mat,
+#                         random_state=42)
+
+model2 = hmm.GaussianHMM(4, "full")
+model2.fit([xdata])
+
+print "--real model--\nmean: {}\ncovar: {}\n\n--fitted model--\nmean: {}\ncovar: {}".format(\
+        model.means_, model.covars_, model2.means_, model2.covars_)
 # Plot the sampled data
-plt.plot(X[:, 0], X[:, 1], "-o", label="observations", ms=6,
+plt.figure(0)
+plt.title("Samples of real model")
+plt.plot(xdata[:, 0], xdata[:, 1], "-o", label="observations", ms=6,
          mfc="orange", alpha=0.7)
 
 # Indicate the component numbers
@@ -45,4 +55,8 @@ for i, m in enumerate(means):
              size=17, horizontalalignment='center',
              bbox=dict(alpha=.7, facecolor='w'))
 plt.legend(loc='best')
+plt.figure(1)
+plt.title("Means of models")
+plt.plot(model.means_[:,0], model.means_[:,1], 'ob')
+plt.plot(model2.means_[:,0], model2.means_[:,1], '+r')
 plt.show()
