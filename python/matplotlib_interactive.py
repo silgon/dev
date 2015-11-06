@@ -48,7 +48,6 @@ radio = mwidget.RadioButtons(rax, ('red', 'blue', 'green'), active=2)
 
 def colorfunc(label):
     circ.set_color(label)
-    # l.set_color(label)
     fig.canvas.draw_idle()
 radio.on_clicked(colorfunc)
 plt.show()
