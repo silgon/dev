@@ -8,7 +8,7 @@ import h5py
 
 # @write
 FILENAME = "test.h5"
-f = h5py.File("test.h5", "w")
+f = h5py.File(FILENAME, "w")
 g1 = f.create_group('/Trigonometric_functions')
 x = np.linspace(0, np.pi*2, 100)
 y1 = np.sin(x)
@@ -40,7 +40,7 @@ g3_dset=g3.create_dataset('cdata', data=cdata, compression="gzip")
 f.close()
 
 # @read
-f = h5py.File("test.h5", "r")
+f = h5py.File(FILENAME, "r")
 dset = f['/all_in_one']
 data1 = dset['data'].value  # all in one
 data2 = dset['cdata'].value  # compound
