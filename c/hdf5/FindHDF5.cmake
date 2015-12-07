@@ -1,0 +1,32 @@
+FIND_PATH(HDF5_INCLUDE_DIRS NAMES H5Cpp.h
+  PATHS
+  /opt/local/include
+  /usr/include
+  /usr/local/include
+)
+
+FIND_LIBRARY(HDF5_LIB NAMES hdf5
+  PATHS
+  /opt/local/lib
+  /usr/local/lib
+  /usr/lib
+)
+
+FIND_LIBRARY(HDF5CPP_LIB NAMES hdf5_cpp
+  PATHS
+  /opt/local/lib
+  /usr/local/lib
+  /usr/lib
+)
+
+SET(HDF5_LIBRARIES ${HDF5_LIB} ${HDF5CPP_LIB})
+
+IF (HDF5_INCLUDE_DIRS AND HDF5_LIBRARIES)
+  SET(HDF5_FOUND TRUE)
+  MESSAGE(STATUS "HDF5 found")
+  MESSAGE(STATUS "HDF5 Include dirs: " ${HDF5_INCLUDE_DIRS})
+  MESSAGE(STATUS "HDF5 Library: " ${HDF5_LIB})
+  MESSAGE(STATUS "HDF5_Cpp Library: " ${HDF5CPP_LIB})
+ELSE (HDF5_INCLUDE_DIRS AND HDF5_LIBRARIES)
+  MESSAGE(STATUS "HDF5 was not found")
+ENDIF(HDF5_INCLUDE_DIRS AND HDF5_LIBRARIES)
