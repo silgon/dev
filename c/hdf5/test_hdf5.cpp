@@ -70,7 +70,7 @@ int main (void)
         file.close();
         delete dataspace;
         delete dataset;
-        delete dataptr;
+        dataptr = NULL;
 
         file.openFile(FILE_NAME, H5F_ACC_RDONLY);
         dataset = new H5::DataSet(file.openDataSet(DATASET_NAME));
@@ -84,7 +84,7 @@ int main (void)
         file.close();
         delete dataspace;
         delete dataset;
-        delete dataptr;
+        dataptr = NULL;
 
     }  // end of try block
     // catch failure caused by the H5File operations
