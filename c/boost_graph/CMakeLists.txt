@@ -6,4 +6,5 @@ find_package(Boost 1.54 COMPONENTS graph REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 add_executable(directed_graph_simple directed_graph_simple.cpp)
-link_libraries(directed_graph_simple ${Boost_GRAPH_LIBRARY})
+
+add_executable(directed_graph_properties directed_graph_properties.cpp)
