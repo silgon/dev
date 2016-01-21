@@ -8,3 +8,5 @@ include_directories(${Boost_INCLUDE_DIR})
 add_executable(directed_graph_simple directed_graph_simple.cpp)
 
 add_executable(directed_graph_properties directed_graph_properties.cpp)
+
+add_executable(graph_comparison graph_comparison.cpp)
