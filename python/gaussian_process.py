@@ -13,11 +13,11 @@ y = f(x).ravel()
 sigma = 0.3
 
 f_options={
-    "1": lambda x_r, x_p: np.exp(-10*np.dot((x_r-x_p),(x_r-x_p))),
+    "1": lambda x_r, x_p: np.exp(-1*np.dot((x_r-x_p),(x_r-x_p))),
     "2": lambda x_r, x_p: np.exp(-1*np.dot((x_r-x_p),(x_r-x_p)))+0.4*(x_r==x_p)
 }
 
-kernel = f_options["2"]
+kernel = f_options["1"]
 Ker = np.zeros((len(x),len(x)))
 for i in xrange(len(x)):
     for j in xrange(len(x)):
@@ -32,13 +32,17 @@ for i in xrange(len(new_x)):
     Ker_k = [kernel(x_k,x[j]) for j in xrange(len(x))]
     k_k = kernel(x_k,x_k)
     new_y[i] = np.dot(np.dot(Ker_k, np.linalg.inv(Ker)),y)
-    sigma_y[i] = new_y[i] - np.dot(np.dot(Ker_k, np.linalg.inv(Ker)), Ker_k)
+    sigma_y[i] = k_k - np.dot(np.dot(Ker_k, np.linalg.inv(Ker)), Ker_k)
     # print sigma_y[i],
-    # sigma_y[i] = sigma_y[i]**.5
+    sigma_y[i] = sigma_y[i]**.5
     # print ","+str(sigma_y[i])
 
-plt.plot(x, y, 'o', label="real")
-plt.plot(new_x, new_y, '-', label="deduced")
-plt.fill_between(new_x, new_y+sigma_y, new_y-sigma_y, alpha=.5)
+green = sns.xkcd_rgb["faded green"]
+blue = sns.xkcd_rgb["windows blue"]
+purple = sns.xkcd_rgb["dusty purple"]
+plt.plot(new_x, f(new_x),'--', label="real", color=green)
+plt.plot(x, y, 'o', label="samples", color=purple)
+plt.plot(new_x, new_y, '-', label="deduced", color=blue)
+plt.fill_between(new_x, new_y+sigma_y, new_y-sigma_y, alpha=.5, facecolor=blue)
 plt.legend()
 plt.show()
