@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
     std::cout << "Process running in " << argv[1] << " processors.\n";
     int n_processors = std::stoi(argv[1]);
     const size_t size = 256;
-    double sinTable[size]; // faster with pointer than vector
+    double sinTable[size];
     // std::vector<double> sinTable(size);
 #pragma omp parallel for num_threads(n_processors)
     for(size_t i=0; i<100000; ++i){
