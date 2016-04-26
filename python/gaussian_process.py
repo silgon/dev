@@ -12,10 +12,15 @@ y = f(x).ravel()
 # y = np.array([-1.6, -1.2, -0.5, 0, 0.5, 1])
 sigma = 0.3
 
+s_f = 10
+s_n = 1e-1
+l = 1
 f_options={
-    "1": lambda x_r, x_p: np.exp(-1*np.dot((x_r-x_p),(x_r-x_p))),
-    "2": lambda x_r, x_p: np.exp(-1*np.dot((x_r-x_p),(x_r-x_p)))+0.4*(x_r==x_p)
+    "1": lambda x_r, x_p: s_f**2*np.exp(-1*np.dot((x_r-x_p),(x_r-x_p))/(2*l**2)),
+    "2": lambda x_r, x_p: np.exp(-.1*np.dot((x_r-x_p),(x_r-x_p)))\
+    +0.004*(x_r==x_p)
 }
+
 
 kernel = f_options["1"]
 Ker = np.zeros((len(x),len(x)))
@@ -27,15 +32,18 @@ new_x = np.linspace(1, 10, 100)
 new_y = np.zeros(len(new_x))
 sigma_y = np.zeros(len(new_x))
 
+Ker_k = np.zeros((len(new_x), len(x)))
+K_k = np.zeros(len(new_x))
+
 for i in xrange(len(new_x)):
     x_k = new_x[i]
-    Ker_k = [kernel(x_k,x[j]) for j in xrange(len(x))]
-    k_k = kernel(x_k,x_k)
-    new_y[i] = np.dot(np.dot(Ker_k, np.linalg.inv(Ker)),y)
-    sigma_y[i] = k_k - np.dot(np.dot(Ker_k, np.linalg.inv(Ker)), Ker_k)
-    # print sigma_y[i],
-    sigma_y[i] = sigma_y[i]**.5
-    # print ","+str(sigma_y[i])
+    Ker_k[i] = [kernel(x_k,x[j]) for j in xrange(len(x))]
+    K_k[i] = kernel(x_k,x_k)
+new_y = np.dot(np.dot(Ker_k, np.linalg.inv(Ker)),y)
+
+for i in xrange(len(new_x)):
+    sigma_y[i] = K_k[i] - np.dot(np.dot(Ker_k[i], np.linalg.inv(Ker)), Ker_k[i])
+sigma_y = sigma_y**.5
 
 green = sns.xkcd_rgb["faded green"]
 blue = sns.xkcd_rgb["windows blue"]
