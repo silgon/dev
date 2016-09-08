@@ -10,7 +10,7 @@ k2 = 10
 K = np.array([[-k1, -k2]])
 x0 = np.array([[0, 0]]).T
 x_goal = np.array([[5, 0]]).T
-dt = .01
+dt = .02
 
 x_t = x0
 err = x_goal - x_t
