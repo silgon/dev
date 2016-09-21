@@ -12,7 +12,7 @@ y = f(x).ravel()
 # y = np.array([-1.6, -1.2, -0.5, 0, 0.5, 1])
 sigma = 0.3
 
-s_f = 10
+s_f = 5
 s_n = 1e-1
 l = 1
 f_options={
