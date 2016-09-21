@@ -14,9 +14,9 @@ println("Pmap counting heads")
 println(v)
 
 # println("parallel for counting heads")
-# @parallel for i in 50000:1000:70000
-#     println(count_heads(i))
-# end
+@sync @parallel for i in 50000:1000:70000
+    println(count_heads(i))
+end
 # sleep(10)
 
 @everywhere using Graphs
