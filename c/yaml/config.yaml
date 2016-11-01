@@ -1,0 +1,6 @@
+username: silgon
+testvalue: 54
+testarray: [2,3,4,5]
+testsub:
+  value1: hello
+  value2: there
