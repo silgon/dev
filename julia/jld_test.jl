@@ -1,12 +1,14 @@
 using JLD, HDF5
 
-jldopen("test.jld", "w") do file
+filename = "test.jld"
+# writeoption = isfile(filename)?"r+":"w"  # maybe useful later
+jldopen(filename, "w") do file
     g = g_create(file, "mygroup") # create a group
     g["dset1"] = 3.2              # create a scalar dataset inside the group
     g["dset2"] = rand(2,2)
 end
 
-jldopen("test.jld", "r") do file
+jldopen(filename, "r") do file
     a=read(file, "mygroup")
     println(a)
 end
@@ -37,12 +39,12 @@ for i = 1 : ne
     eweights1[i] = we[3]
 end
 
-jldopen("test.jld", "w") do file
+jldopen(filename, "r+") do file
     g = g_create(file, "graph") # create a group
     g["dset1"] = g1              # paste graph
 end
 
-jldopen("test.jld", "r") do file
+jldopen(filename, "r") do file
     g=read(file, "graph")
     println(g)
 end
