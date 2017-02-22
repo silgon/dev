@@ -7,3 +7,5 @@ build2:
 	mcs hello_world2.cs -pkg:dotnet
 run2:
 	mono hello_world2.exe
+run_server:
+	xsp4 --port 9000
