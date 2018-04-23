@@ -44,8 +44,9 @@ for _ in range(NBR_WORKERS):
 
 for _ in range(NBR_WORKERS * 10):
     # LRU worker is next waiting in the queue
-    address, empty, ready = client.recv_multipart()
-    time.sleep(.5)
+    address, empty, msg = client.recv_multipart()
+    print("address {}, empty {}, msg {}".format(address, empty, msg))
+    time.sleep(.5*random.random())
     client.send_multipart([
         address,
         b'',
