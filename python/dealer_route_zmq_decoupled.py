@@ -29,6 +29,20 @@ def dealer_thread(context=None):
         # Do some random work
         time.sleep(0.1 * random.random())
 
+def dealer_dec_pub(socket):
+    while True:
+        msg = "ready"
+        print("dec_send: {}".format(msg))
+        socket.send(msg)
+        time.sleep(0.1 * random.random())
+
+def dealer_dec_sub(socket):
+    while True:
+        workload = socket.recv()
+        print("dec_received: %s" % workload)
+        time.sleep(0.1 * random.random())
+
+
 def router_thread(context=None):
     context = context or zmq.Context.instance()
     router = context.socket(zmq.ROUTER)
@@ -57,6 +71,20 @@ if __name__ == '__main__':
     dt2.start()
     rt.setDaemon(True)
     rt.start()
+
+    dec_dealer = context.socket(zmq.DEALER)
+    # id with a low probability that it's going to be repeated for two workers
+    did = str(random.randint(0,10000))
+    print("dealer id: {}".format(did))
+    dec_dealer.setsockopt(zmq.IDENTITY, did)
+    dec_dealer.connect(SOCKET_NAME)
+    dec_pub_t=Thread(target=dealer_dec_pub, args=(dec_dealer,))
+    dec_sub_t=Thread(target=dealer_dec_sub, args=(dec_dealer,))
+    dec_pub_t.setDaemon(True)
+    dec_pub_t.start()
+    dec_sub_t.setDaemon(True)
+    dec_sub_t.start()
+
 
     print("threads started")
     while True:
