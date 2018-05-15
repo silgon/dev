@@ -37,3 +37,7 @@ for n1 in range(N):
         W[n1,n2,0] = win(tmp[n1],np.array([tmp[n2]]))
         W[n1,n2,1] = win(tmp[n2],np.array([tmp[n1]]))
 
+p2_am = np.argmax(W[:,:,1],axis=1)
+p1_am = np.argmax([W[n1,p2_am[n1],0] for n1 in range(N)])
+print(W[p1_am,p2_am[p1_am]])
+
