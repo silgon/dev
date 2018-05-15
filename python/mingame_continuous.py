@@ -18,3 +18,19 @@ def win(p1, p_arr):
 
 x = np.array([.1,.7,.9])
 res = [win(x[i],np.delete(x,i)) for i in range(len(x))]
+
+import matplotlib.pyplot as plt
+n_samples = 50
+tmp = np.linspace(0,1,n_samples)
+X, Y = np.meshgrid(tmp, tmp)
+Z = np.zeros_like(X)
+for i in range(n_samples):
+    for j in range(n_samples):
+        Z[i,j] = win(X[i,j], np.array([Y[i,j]]))
+plt.pcolor(X, Y, Z)
+plt.colorbar()
+plt.show()
+
+def ob(x):
+    d=0
+    return d
